@@ -81,6 +81,7 @@ class Battle(models.Model):
 	sp_casualities_attacker = models.IntegerField()
 	sp_casualities_defender = models.IntegerField()
 	end_type = models.CharField(max_length=255, choices=END_TYPE_CHOICES)
+	battle_manager_started = models.BooleanField(default=False)
 	attacker_empire = models.ForeignKey(Empire, related_name='attacker_empireBattle')
 	defender_empire = models.ForeignKey(Empire, related_name='defender_empireBattle')
 
