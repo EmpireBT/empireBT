@@ -43,6 +43,8 @@ class UserCustom(AbstractUser):
 	rank = models.CharField(max_length=255, choices=RANK_CHOICES)
 	websocket_token = models.CharField(max_length=255)
 	supply_points = models.IntegerField(default=0)
+	chat_oneonone_connected = models.BooleanField(default = False)
+	chat_empire_connected = models.BooleanField(default = False)
 
 class Event(models.Model):
 	name = models.CharField(max_length=255)
