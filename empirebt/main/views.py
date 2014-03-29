@@ -32,8 +32,11 @@ def battle_auth(req):
 		).get(id = reg.GET["user_id"])
 		#models.Battle.objects.filter(id = req.GET["battle_id"], attacker__name = 'Pancho').get()
 		battle = models.Battle.objects.get(id = req.GET["battle_id"])
-		valid = battle.attacker.id == user.id or battle.defender.id == user.id:
-		return jsonfy({'valid': valid})
+		valid = battle.attacker.id == user.id or battle.defender.id == user.id
+		bms = battle.battle_manager_started
+		battle.battle_manager_started = True
+		battle.save()
+		return jsonfy({'valid': valid, 'battle_manager_started': bms})
 
 	except ObjectDoesNotExist, e:
 		return jsonfy({'valid': False})
@@ -41,11 +44,16 @@ def battle_auth(req):
 def connected_oneonone(req):
 	if "user_id" not in req.GET or "presence" not in req.GET:
 		return jsonfy({'valid': False})
-	pass
+	try:
+		user = models.UserCustom.objects.get(id = req.GET["user_id"])
+		user.chat_oneonone_connected = req.GET["presence"]
+		user.save()
+		return jsonfy({'valid': user.chat_oneonone_connected})
+	except Exception, e:
+		return jsonfy({'valid': False})
 def connected_empire(req):
 	if "user_id" not in req.GET or "presence" not in req.GET or "empire_id" not in req.GET:
 		return jsonfy({'valid': False})
-	pass
 def list_oneonone(req):
 
 	pass
