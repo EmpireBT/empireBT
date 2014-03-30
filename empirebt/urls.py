@@ -31,5 +31,10 @@ urlpatterns = patterns('',
 	url(r'^battle/info\.json', views.battle_info),
     url(r'^battle/result\.json', views.battle_result),
     url(r'^login/', views.lock_summary),
+    url(r'^dashboard/summary_lock\.json', views.summary_lock),
+    url(r'^falsify', views.falsify),
+    url(r'^dashboard/summary/edit\.json', views.change_summary),
+    #url(r'^dashboard/decisions_lock\.json', views.decisions_lock),
+    url(r'^dashboard/decisions_attack/new\.json', views.add_attack),
 
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

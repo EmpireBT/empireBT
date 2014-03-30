@@ -29,8 +29,8 @@ def battle_auth(req):
 
 	try:
 		user = models.UserCustom.objects.filter(
-			websocket_token = reg.GET["token"]
-		).get(id = reg.GET["user_id"])
+			websocket_token = req.GET["token"]
+		).get(id = req.GET["user_id"])
 		#models.Battle.objects.filter(id = req.GET["battle_id"], attacker__name = 'Pancho').get()
 		battle = models.Battle.objects.get(id = req.GET["battle_id"])
 		valid = battle.attacker.id == user.id or battle.defender.id == user.id
@@ -47,33 +47,45 @@ def connected_oneonone(req):
 		return jsonfy({'valid': False})
 	try:
 		user = models.UserCustom.objects.get(id = req.GET["user_id"])
-		user.chat_oneonone_connected = True if req.GET["presence"] == "True" else False
+		user.chat_oneonone_connected = True if req.GET["presence"] == "true" else False
 		user.save()
-		return jsonfy({'valid': user.chat_oneonone_connected})
+		return jsonfy({'valid': True})
 	except ObjectDoesNotExist, e:
-		return jsonfy({'valid': False})
+		return jsonfy({'valid': False, 'exception': True})
 
 def connected_empire(req):
 	if "user_id" not in req.GET or "presence" not in req.GET or "empire_id" not in req.GET:
-		return jsonfy({'valid': False})
+		return jsonfy({'ok': False})
 	try:
 		user = models.UserCustom.objects.filter(empire = req.GET["empire_id"]).get(id = req.GET["user_id"])
-		#return jsonfy({'user': list(user)})
-		user.chat_empire_connected = req.GET["presence"] == "True"
-		user.save()
-		return jsonfy({'valid': user.chat_empire_connected})
+		print user
+		
+		user.chat_empire_connected = req.GET["presence"] == "true"
+		print user.username, user.chat_empire_connected
+		print req.GET['presence']
+		print user.save()
+		print user.chat_empire_connected
+		return jsonfy({'ok': True})
 	except ObjectDoesNotExist, e:
-		return jsonfy({'valid': False, 'exception': True})
+		return jsonfy({'ok': False, 'exception': True})
 
 def list_oneonone(req):
 	cons = models.UserCustom.objects.filter(chat_oneonone_connected = True).values('id', 'username')
 	return jsonfy({'list': list(cons)})
 
+@login_required(login_url = '/login/')
 def list_empire(req):
+
 	if "empire_id" not in req.GET:
+		return jsonfy({'ok': False})
+	user = req.user
+	#print dir(user.empire)
+	#return jsonfy({})
+	if user.empire.id != int(req.GET['empire_id']):
 		return jsonfy({'valid': False})
+	#return jsonfy({})
 	cons = models.UserCustom.objects.filter(chat_empire_connected = True, empire = req.GET["empire_id"]).values('id', 'username')
-	return jsonfy({'values': True, 'list': list(cons)})
+	return jsonfy({'ok': True, 'list': list(cons)})
 
 def battle_info(req):
 	if "battle_id" not in req.GET:
@@ -110,6 +122,81 @@ def battle_result(req):
 @login_required(login_url = '/login/')
 def lock_summary(req):
 	user = req.UserCustom
+
+@login_required(login_url = '/login/')
+def summary_lock(req):
+	if "empire_id" not in req.POST or "lock" not in req.POST:
+		return jsonfy({'ok': False})
+	try:
+		user = req.user
+		empire = models.Empire.objects.get(id = req.POST['empire_id'])
+		if empire.summary_lock == None or empire.summary_lock.rank > user.rank:
+			empire.summary_lock = user if req.POST['lock'] == "true" else None
+		else:
+			return jsonfy({'ok': False})
+		empire.save()
+		return jsonfy({'ok': True})
+	except ObjectDoesNotExist, e:
+		return jsonfy({'ok': False})
+
+@login_required(login_url = '/login/')
+def change_summary(req):
+	if "empire_id" not in req.POST or "summary" not in req.POST:
+		return jsonfy({'ok': False})
+	try:
+		user = req.user
+		empire = models.Empire.objects.get(id = req.POST['empire_id'])
+		if empire.summary_lock == None or empire.summary_lock.rank >= user.rank:
+			empire.summary_lock = user
+			empire.summary = req.POST['summary']
+		else:
+			return jsonfy({'ok': False})
+		empire.save()
+		return jsonfy({'ok': True})
+	except ObjectDoesNotExist, e:
+		return jsonfy({'ok': False})
+
+# @login_required(login_url = '/login/')
+# def decisions_lock(req):
+# 	if "empire_id" not in req.POST or "lock" not in req.POST:
+# 		return jsonfy({'ok': False})
+# 	try:
+# 		user = req.user
+# 		empire = models.Empire.objects.get(id = req.POST['empire_id'])
+# 		if empire.decision_locked == None or empire.decision_locked.rank > user.rank:
+# 			empire.decision_locked = user if req.POST['lock'] == "true" else None
+# 		else:
+# 			return jsonfy({'ok': False})
+# 		empire.save()
+# 		return jsonfy({'ok': True})
+# 	except ObjectDoesNotExist, e:
+# 		return jsonfy({'ok': False})
+
+@login_required(login_url = '/login/')
+def add_attack(req):
+	if "empire_id" not in req.POST or "commander_id" not in req.POST or "territory_id" not in req.POST:
+		return jsonfy({'ok': False})
+	try:
+		user = req.user
+		if user.empire.id != int(req.POST['empire_id']):
+			return jsonfy({'valid': False})
+		empire = models.Empire.objects.get(id = req.POST['empire_id'])
+		if empire.decision_locked == None or empire.decision_locked.rank > user.rank:
+			empire.decision_locked = user
+			territory = models.Territory.objects.get(id = req.POST['territory_id'])
+			decision = models.Decision(empire = empire, territory = territory)
+			decision.save()
+			return jsonfy({'ok': True, 'decision_attack_id': decision.id})
+		else:
+			return jsonfy({'ok': False})
+	except ObjectDoesNotExist, e:
+		return jsonfy({'ok': False})
+
+def falsify(req):
+	battle = models.Battle.objects.get(id = 1)
+	battle.battle_manager_started = False
+	battle.save()
+	return jsonfy({'ok': True})
 
 def jsonfy(obj):
 	return HttpResponse(json.dumps(obj))

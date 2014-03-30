@@ -1,6 +1,6 @@
 # Django settings for empirebt project.
 import os, sys
-import dj_database_url
+#import dj_database_url
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
