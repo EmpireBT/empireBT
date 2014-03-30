@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+  		<title>{% block title %}{% endblock %}</title>
+
+		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+		<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}css/flat-ui.css">
+		<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}css/style.css">
+
+		<link href='http://fonts.googleapis.com/css?family=Quintessential' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Playfair+Display+SC' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Ceviche+One' rel='stylesheet' type='text/css'>
+
+		{% block css %}{% endblock %}
+
+		<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+		<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+		{% block js %}{% endblock %}
+	</head>
+	<body>
+		{% block content %}
+
+		{% endblock%}
+	</body>
+</html>

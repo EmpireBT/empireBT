@@ -1,19 +1,32 @@
+from django.views.generic import TemplateView
 from django.conf.urls import patterns, include, url
-from empirebt.main.api import UserResource
-# Uncomment the next two lines to enable the admin:
-# from django.contrib import admin
-# admin.autodiscover()
+from django.conf.urls.static import static
+from django.conf import settings
+from django.contrib.auth.views import login, logout
 
-user_resource = UserResource()
+import empirebt.main.views as views
+
+from empirebt.webapp.views import register, dashboard
+
 
 urlpatterns = patterns('',
-    # Examples:
-    # url(r'^$', 'empirebt.views.home', name='home'),
-    url(r'^api/', include(user_resource.urls)),
 
-    # Uncomment the admin/doc line below to enable admin documentation:
-    # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
+    url(r'^$', TemplateView.as_view(template_name="index.html")),
 
-    # Uncomment the next line to enable the admin:
-    # url(r'^admin/', include(admin.site.urls)),
-)
+    #Login and Logout
+    url(r'^login/$',  login ),
+    url(r'^logout/$', logout, {'next_page' : '/'}),
+
+    url(r'^register/$', register),
+    url(r'^dashboard/$', dashboard),
+
+    url(r'^authorization/general\.json', views.auth_general),
+    url(r'^authorization/chat_empire\.json', views.empire_auth),
+    url(r'^authorization/chat_oneonone\.json', views.oneonone_auth),
+    url(r'^authorization/battle\.json', views.battle_auth),
+    url(r'^chat_oneonone/connected\.json', views.connected_oneonone),
+    url(r'^chat_empire/connected\.json', views.connected_empire),
+    url(r'^chat_oneonone/list\.json', views.list_oneonone),
+    url(r'^chat_empire/list\.json', views.list_empire),
+
+) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
