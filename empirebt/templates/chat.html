@@ -2,6 +2,7 @@
 .chattab{
 	display: inline-block;
 	width: 150px;
+	background: #E6E6E6;
 }
 .messageChatDiv{
 	display: inline-block;
@@ -13,14 +14,41 @@
 .chatDialog{
 	width: 200px;
 	display: inline-block;
+	border: 1px solid gray;
+}
+.chatDialogOptions{
+	border-bottom: 1px solid gray;
 }
 .chatsWrapper,.chatWrapper{
 	display: inline-block;
 }
 .chatContainer{
 	position: fixed;
-	right: 5px;
+	right: 15px;
 	bottom: 5px;
+}
+.chatContainer p{
+	font-size: 14px !important;
+}
+.chatContent{
+	border: 1px solid gray;
+}
+.activetab{
+	border: 1px solid gray;
+}
+#chatArea, #publicWindowArea{
+height: 300px;
+overflow: auto;
+overflow-x: hidden;
+}
+#messageInput,#messageButtonSubmit{
+	display: inline-block;
+}
+#messageInput{
+	width: 240px !important;
+}
+#messageButtonSubmit{
+	width: 60px;
 }
 </style>
 <script type="text/javascript">
@@ -29,41 +57,26 @@ $(document).on('ready', function(){
 		e.preventDefault();
 		$('#empireWindow').hide();
 		$('#publicWindow').removeClass('hidden');
+
+
+		$('#empireTab').removeClass('activetab')
+		$('#publicTab').addClass('activetab')
 	})
 	$('#empireA').on('click', function(e){
 		e.preventDefault();
 		$('#empireWindow').show();
 		$('#publicWindow').addClass('hidden');
+
+				$('#empireTab').addClass('activetab')
+		$('#publicTab').removeClass('activetab')
+
 	})
 })
 </script>
 <div class="chatContainer">
 	<div class="chatsWrapper">
 		<div class="chatDialog">
-			<div>
-				<a href="#">username</a>
-				<a href="#">-</a>
-				<a href="#">x</a>
-			</div>
-			<div class="messagesChatSingleArea">
-					<div class="messageChatSingle">
-						<div class="messageChatSingleDiv">
-							<a href="#">username</a>
-						</div>
-						<div class="messageChatDiv">
-							<p>text text text text text text text text text text text text text</p>
-						</div>
-					</div>
-					<div class="messageSingleArea">
-						<form>
-							<input type="text" class="messageSingleInput">
-							<button type="submit">Send</button>
-						</form>
-					</div>
-			</div>
-		</div>
-		<div class="chatDialog">
-			<div>
+			<div class="chatDialogOptions">
 				<a href="#">username</a>
 				<a href="#">-</a>
 				<a href="#">x</a>
@@ -88,7 +101,7 @@ $(document).on('ready', function(){
 	</div>
 	<div class="chatWrapper">
 		<div class="chatTabs">
-			<div id="empireTab" class="chattab">
+			<div id="empireTab" class="chattab activetab">
 				<a id="empireA" href="#">Empire</a>
 			</div>
 			<div id="publicTab" class="chattab">
@@ -100,42 +113,56 @@ $(document).on('ready', function(){
 				<div id="chatArea">
 					<div class="messageChat">
 						<div class="messageChatDiv">
-							<a href="#">username</a>
-						</div>
-						<div class="messageChatDiv">
-							<p>text text text text text text text text text text text text text</p>
+								<p>
+								<a href="#">username: </a>
+								<span>text text text text text text text text text text text text text</span>
+								</p>
 						</div>
 					</div>
+
 					<div class="messageChat">
 						<div class="messageChatDiv">
-							<a href="#">username</a>
-						</div>
-						<div class="messageChatDiv">
-							<p>text text text text text text text text text text text text text</p>
+								<p>
+								<a href="#">username: </a>
+								<span>text text text text text text text text text text text text text</span>
+								</p>
 						</div>
 					</div>
+
 					<div class="messageChat">
 						<div class="messageChatDiv">
-							<a href="#">username</a>
-						</div>
-						<div class="messageChatDiv">
-							<p>text text text text text text text text text text text text text</p>
+								<p>
+								<a href="#">username: </a>
+								<span>text text text text text text text text text text text text text</span>
+								</p>
 						</div>
 					</div>
+
+					<div class="messageChat">
+						<div class="messageChatDiv">
+								<p>
+								<a href="#">username: </a>
+								<span>text text text text text text text text text text text text text</span>
+								</p>
+						</div>
+					</div>
+
 
 				</div>
 				<div id="messageArea">
 					<form>
-						<input type="text" id="messageInput">
-						<button type="submit">Send</button>
+						<input class="form-control" type="text" id="messageInput">
+						<button id="messageButtonSubmit" class="btn btn-success" type="submit">Send</button>
 					</form>
 				</div>
 			</div>
 			<div id="publicWindow" class="hidden">
-				<ul>
-					<li><a href="#">username1</a></li>
-					<li><a href="#">username1</a></li>
-				</ul>
+				<div id="publicWindowArea">
+					<ul class="listusersconnected">
+						<li><a href="#">username1</a></li>
+						<li><a href="#">username1</a></li>
+					</ul>
+				</div>
 			</div>
 		</div>
 	</div>

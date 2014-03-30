@@ -2,6 +2,46 @@
 
 {% block content %}
 
+<div class="row">
+	<div class="col-md-8">
+		<div>
+			<h2>Communication Dashboard</h2>
+			<h4>{{ user.empire.name }}</h4>
+			<span>Summary by <a href="#">{{ user.empire.emperor }}</a></span></br>
+			<a href="#"><span class="fui-lock"></span>Lock</a>
+			<p>{{ user.empire.summary}}</p>
+		</div>
+		<div>
+			<h4>Today's Decisions</h4>
+
+			<div>
+				<a href="#">>Attacks</a>
+				<div class="attacksWrapper">
+
+				</div>
+			</div>
+
+			<div>
+				<a href="#">>Defends</a>
+				<div class="attacksWrapper">
+
+				</div>
+			</div>
+
+			<div>
+				<a href="#">>Movements</a>
+				<div class="attacksWrapper">
+
+				</div>
+			</div>
+
+		</div>
+
+
+	</div>
+</div>
+
+
 {% include "chat.html" %}
 
 {% endblock %}
