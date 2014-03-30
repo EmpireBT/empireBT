@@ -13,3 +13,5 @@ localsettings.py
 .DS_Store
 
 empirebt/.DS_Store
+
+*.orig
