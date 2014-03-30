@@ -1,6 +1,7 @@
 # Create your views here.
 from django.http import HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.decorators import login_required
 import empirebt.main.models as models
 import json
 
@@ -105,6 +106,10 @@ def battle_result(req):
 		return jsonfy({'ok': True})
 	except ObjectDoesNotExist, e:
 		return jsonfy({'ok': False})
-	
+
+@login_required(login_url = '/login/')
+def lock_summary(req):
+	user = req.UserCustom
+
 def jsonfy(obj):
 	return HttpResponse(json.dumps(obj))

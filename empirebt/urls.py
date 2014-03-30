@@ -23,6 +23,7 @@ urlpatterns = patterns('',
     url(r'^chat_empire/list\.json', views.list_empire),
     url(r'^battle/info\.json', views.battle_info),
     url(r'^battle/result\.json', views.battle_result),
+    url(r'^login/', views.lock_summary),
     #url(r'^authorization/', include(general_authorization.urls)),
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
