@@ -34,8 +34,9 @@ class Empire(models.Model):
 	fallen_date = models.DateTimeField(null=True)
 	supply_points = models.IntegerField(default=200)
 	moral = models.IntegerField(default=3)
-	summary = models.CharField(max_length=255)
-	summary_locked = models.ForeignKey(User, blank=True ,null=True, related_name = "summary_lockedEmpire")
+	summary = models.CharField(default='', max_length=255)
+	summary_locked = models.ForeignKey(User, null=True, related_name = "summary_lockedEmpire")
+	decision_locked = models.ForeignKey(User, null=True, related_name = "decision_lockedEmpire")
 
 
 class UserCustom(AbstractUser):
@@ -61,10 +62,10 @@ class Territory(models.Model):
 	name = models.CharField(max_length=255)
 	empire = models.ForeignKey(Empire)
 	commander = models.ForeignKey(User)
-	battlefield = models.CharField(max_length=4096)
-	frontier1 = models.ForeignKey('self', related_name='frontier1Territory')
-	frontier2 = models.ForeignKey('self', related_name='frontier2Territory')
-	frontier3 = models.ForeignKey('self', related_name='frontier3Territory')
+	battlefield = models.CharField(default='',max_length=4096)
+	frontier1 = models.ForeignKey('self', null=True, related_name='frontier1Territory')
+	frontier2 = models.ForeignKey('self', null=True, related_name='frontier2Territory')
+	frontier3 = models.ForeignKey('self', null=True, related_name='frontier3Territory')
 	supply_points = models.IntegerField(default=0)
 	sp_points_1mov = models.IntegerField(default=0)
 	sp_points_2mov = models.IntegerField(default=0)
@@ -80,10 +81,10 @@ class Battle(models.Model):
 	conf_attacker = models.CharField(max_length=4096)
 	conf_defender = models.CharField(max_length=4096)
 	territory = models.ForeignKey(Territory, related_name='territoryBattle')
-	sp_conceded = models.IntegerField()
-	sp_casualties_attacker = models.IntegerField()
-	sp_casualties_defender = models.IntegerField()
-	end_type = models.CharField(max_length=255, choices=END_TYPE_CHOICES)
+	sp_conceded = models.IntegerField(null=True)
+	sp_casualties_attacker = models.IntegerField(null=True)
+	sp_casualties_defender = models.IntegerField(null=True)
+	end_type = models.CharField(max_length=255, null=True, choices=END_TYPE_CHOICES)
 	battle_manager_started = models.BooleanField(default=False)
 	attacker_empire = models.ForeignKey(Empire, related_name='attacker_empireBattle')
 	defender_empire = models.ForeignKey(Empire, related_name='defender_empireBattle')
@@ -93,6 +94,7 @@ class Decision(models.Model):
 	timestamp = models.DateTimeField(auto_now_add=True)
 	empire = models.ForeignKey(Empire)
 	territory = models.ForeignKey(Territory)
+	final = models.BooleanField(default=False)
 
 class DecisionAttack(Decision):
 	commander = models.ForeignKey(User)
@@ -111,7 +113,7 @@ class DecisionEvaluation(models.Model):
 	description = models.CharField(max_length=255)
 
 
-class DecisionEvaluationAtack(DecisionEvaluation):
+class DecisionEvaluationAttack(DecisionEvaluation):
 	decision_attack = models.ForeignKey(DecisionAttack)
 
 
