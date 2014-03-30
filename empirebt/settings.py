@@ -7,6 +7,8 @@ ADMINS = (
      ('Hector Gomez', 'hector.agr@gmail.com'),
 )
 
+AUTH_USER_MODEL = 'main.UserCustom'
+
 MANAGERS = ADMINS
 
 DATABASES = {

@@ -31,15 +31,15 @@ class Empire(models.Model):
 	emperor = models.ForeignKey(User, related_name="emperorEmpire")
 	name = models.CharField(max_length=255)
 	start_date = models.DateTimeField(auto_now_add=True)
-	fallen_date = models.DateTimeField()
+	fallen_date = models.DateTimeField(null=True)
 	supply_points = models.IntegerField(default=200)
 	moral = models.IntegerField(default=3)
 	summary = models.CharField(max_length=255)
-	summary_locked = models.ForeignKey(User, blank=True ,null=True)
+	summary_locked = models.ForeignKey(User, blank=True ,null=True, related_name = "summary_lockedEmpire")
 
 
 class UserCustom(AbstractUser):
-	empire = models.ForeignKey(Empire, blank=True, null=True)
+	empire = models.ForeignKey(Empire, blank=True, null=True, related_name="empireUserCustom")
 	rank = models.CharField(max_length=255, choices=RANK_CHOICES)
 	websocket_token = models.CharField(max_length=255)
 	supply_points = models.IntegerField(default=0)
@@ -103,7 +103,7 @@ class DecisionDefend(Decision):
 
 class DecisionMove(Decision):
 	territory_destination = models.ForeignKey(Territory)
-	supply_points = models.IntegerField()
+	supply_points = models.IntegerField(default=0)
 
 
 class DecisionEvaluation(models.Model):
