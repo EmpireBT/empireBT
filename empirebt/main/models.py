@@ -61,6 +61,7 @@ class Territory(models.Model):
 	name = models.CharField(max_length=255)
 	empire = models.ForeignKey(Empire)
 	commander = models.ForeignKey(User)
+	battlefield = models.CharField(max_length=4096)
 	frontier1 = models.ForeignKey('self', related_name='frontier1Territory')
 	frontier2 = models.ForeignKey('self', related_name='frontier2Territory')
 	frontier3 = models.ForeignKey('self', related_name='frontier3Territory')
