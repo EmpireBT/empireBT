@@ -31,6 +31,11 @@
 	background: rgba(10,10,10,.5);
 	color: white;
 }
+.listusersconnected{
+	list-style: none;
+	left: -30px;
+	position: relative;
+}
 img.cover {
   /* Set rules to fill background */
   min-height: 100%;
