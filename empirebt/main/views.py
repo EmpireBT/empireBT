@@ -156,21 +156,21 @@ def change_summary(req):
 	except ObjectDoesNotExist, e:
 		return jsonfy({'ok': False})
 
-# @login_required(login_url = '/login/')
-# def decisions_lock(req):
-# 	if "empire_id" not in req.POST or "lock" not in req.POST:
-# 		return jsonfy({'ok': False})
-# 	try:
-# 		user = req.user
-# 		empire = models.Empire.objects.get(id = req.POST['empire_id'])
-# 		if empire.decision_locked == None or empire.decision_locked.rank > user.rank:
-# 			empire.decision_locked = user if req.POST['lock'] == "true" else None
-# 		else:
-# 			return jsonfy({'ok': False})
-# 		empire.save()
-# 		return jsonfy({'ok': True})
-# 	except ObjectDoesNotExist, e:
-# 		return jsonfy({'ok': False})
+@login_required(login_url = '/login/')
+def decisions_lock(req):
+	if "empire_id" not in req.POST or "lock" not in req.POST:
+		return jsonfy({'ok': False})
+	try:
+		user = req.user
+		empire = models.Empire.objects.get(id = req.POST['empire_id'])
+		if empire.decision_locked == None or empire.decision_locked.rank > user.rank:
+			empire.decision_locked = user if req.POST['lock'] == "true" else None
+		else:
+			return jsonfy({'ok': False})
+		empire.save()
+		return jsonfy({'ok': True})
+	except ObjectDoesNotExist, e:
+		return jsonfy({'ok': False})
 
 @login_required(login_url = '/login/')
 def add_attack(req):
@@ -183,15 +183,140 @@ def add_attack(req):
 		empire = models.Empire.objects.get(id = req.POST['empire_id'])
 		if empire.decision_locked == None or empire.decision_locked.rank > user.rank:
 			empire.decision_locked = user
+			empire.save()
 			territory = models.Territory.objects.get(id = req.POST['territory_id'])
 			decision = models.Decision(empire = empire, territory = territory)
 			decision.save()
-			return jsonfy({'ok': True, 'decision_attack_id': decision.id})
+			dattack = models.DecisionAttack(Decision=decision)
+			dattack.save()
+			return jsonfy({'ok': True, 'decision_attack_id': dattack.id})
 		else:
 			return jsonfy({'ok': False})
 	except ObjectDoesNotExist, e:
 		return jsonfy({'ok': False})
 
+@login_required(login_url = '/login/')
+def remove_attack(req):
+	if "decision_attack_id" not in req.POST:
+		return jsonfy({'ok': False})
+	try:
+		user = req.user
+		decision = models.Decision.objects.get(id=req.POST['decision_attack_id'])
+		empire = models.Empire.objects.get(id = decision.empire)
+		if empire.decision_locked == None or empire.decision_locked.rank > user.rank:
+			empire.decision_locked = user
+			empire.save()
+			models.DecisionAttack.objects.filter(Decision = decision).delete()
+			decision.delete()
+			return jsonfy({'ok': True})
+		else:
+			return jsonfy({'ok': False})
+
+	except ObjectDoesNotExist, e:
+		return jsonfy({'ok': False})
+
+@login_required(login_url = '/login/')
+def add_defend(req):
+	if "empire_id" not in req.POST or "commander_id" not in req.POST or "territory_id" not in req.POST:
+		return jsonfy({'ok': False, 'decision_defend_id': ''})
+	try:
+		user = req.user
+		if user.empire.id != int(req.POST['empire_id']):
+			return jsonfy({'ok': False, 'decision_defend_id': ''})
+		empire = models.Empire.objects.get(id = req.POST['empire_id'])
+		if empire.decision_locked == None or empire.decision_locked.rank > user.rank:
+			empire.decision_locked = user
+			empire.save()
+			territory = models.Territory.objects.get(id = req.POST['territory_id'])
+			decision = models.Decision(empire = empire, territory = territory)
+			decision.save()
+			ddefend = models.DecisionDefend(Decision=decision)
+			ddefend.save()
+			return jsonfy({'ok': True, 'decision_defend_id': ddefend.id})
+		else:
+			return jsonfy({'ok': False})
+	except ObjectDoesNotExist, e:
+		return jsonfy({'ok': False, 'decision_defend_id': ''})
+
+@login_required(login_url = '/login/')
+def remove_defend(req):
+	if "decision_defend_id" not in req.POST:
+		return jsonfy({'ok': False})
+	try:
+		user = req.user
+		decision = models.Decision.objects.get(id=req.POST['decision_defend_id'])
+		empire = models.Empire.objects.get(id = decision.empire)
+		if empire.decision_locked == None or empire.decision_locked.rank > user.rank:
+			empire.decision_locked = user
+			empire.save()
+			models.DecisionDefend.objects.filter(Decision = decision).delete()
+			decision.delete()
+			return jsonfy({'ok': True})
+		else:
+			return jsonfy({'ok': False})
+	except ObjectDoesNotExist, e:
+		return jsonfy({'ok': False})
+
+@login_required(login_url = '/login/')
+def attack_decision_eval(req):
+	if "type" not in req.POST or "decision_attack_id" not in req.POST or "description" not in req.POST:
+		return jsonfy({'ok': False})
+	try:
+		user = req.user
+		dattack = models.DecisionAttack.objects.get(id=req.POST['decision_attack_id'])
+		empire = models.Empire.objects.get(id = dattack.empire)
+		if empire.decision_locked == None or empire.decision_locked.rank > user.rank:
+			empire.decision_locked = user
+			empire.save()
+			deval = models.DecisionEvaluation(type_enum = req.POST['type'], description = req.POST['description'])
+			deval.save()
+			deval_attack = models.DecisionEvaluationAttack(DecisionEval = deval)
+			deval_attack.save()
+			return jsonfy({'ok': True, 'decision_attack_evaluation_id': deval_attack.id})
+		else:
+			return jsonfy({'ok': False})
+	except ObjectDoesNotExist, e:
+		return jsonfy({'ok': False})
+
+@login_required(login_url = '/login/')
+def defend_decision_eval(req):
+	if "type" not in req.POST or "decision_defend_id" not in req.POST or "description" not in req.POST:
+		return jsonfy({'ok': False})
+	try:
+		user = req.user
+		ddefend = models.DecisionDefend.objects.get(id=req.POST['decision_defend_id'])
+		empire = models.Empire.objects.get(id = ddefend.empire)
+		if empire.decision_locked == None or empire.decision_locked.rank > user.rank:
+			empire.decision_locked = user
+			empire.save()
+			deval = models.DecisionEvaluation(type_enum = req.POST['type'], description = req.POST['description'])
+			deval.save()
+			deval_defend = models.DecisionEvaluationDefend(DecisionEval = deval)
+			deval_defend.save()
+			return jsonfy({'ok': True, 'decision_defend_evaluation_id': deval_defend.id})
+		else:
+			return jsonfy({'ok': False})
+	except ObjectDoesNotExist, e:
+		return jsonfy({'ok': False})
+
+@login_required(login_url = '/login/')
+def defend_decision_final(req):
+	if "decision_defend_id" not in req.POST:
+		return jsonfy({'ok': False})
+	try:
+		user = req.user
+		ddefend = models.DecisionDefend.objects.get(id=req.POST['decision_defend_id'])
+		empire = models.Empire.objects.get(id = ddefend.empire)
+		if empire.decision_locked == None or empire.decision_locked.rank > user.rank:
+			empire.decision_locked = user
+			empire.save()
+			ddefend.final = True
+			ddefend.save()
+			return jsonfy({'ok': True})
+		else:
+			return jsonfy({'ok': False})
+	except ObjectDoesNotExist, e:
+		return jsonfy({'ok': False})
 def falsify(req):
 	battle = models.Battle.objects.get(id = 1)
 	battle.battle_manager_started = False
