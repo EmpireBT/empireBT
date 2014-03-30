@@ -1,8 +1,23 @@
+import os
+import string
+import hashlib
+
+
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 
 User = settings.AUTH_USER_MODEL 
+
+def generate_random_string(length, stringset=string.ascii_letters+string.digits+string.punctuation):
+	'''
+	Returns a string with `length` characters chosen from `stringset`
+	>>> len(generate_random_string(20) == 20 
+	'''
+	token = ''.join([stringset[i%len(stringset)] \
+	    for i in [ord(x) for x in os.urandom(length)]])
+	return hashlib.sha256(token).hexdigest()[:64]
+
 
 RANK_CHOICES = (
 	(0,'Emperor'),
@@ -31,7 +46,7 @@ class Empire(models.Model):
 	emperor = models.ForeignKey(User, related_name="emperorEmpire")
 	name = models.CharField(max_length=255)
 	start_date = models.DateTimeField(auto_now_add=True)
-	fallen_date = models.DateTimeField(null=True)
+	fallen_date = models.DateTimeField(blank=True, null=True)
 	supply_points = models.IntegerField(default=200)
 	moral = models.IntegerField(default=3)
 	summary = models.CharField(default='', max_length=255)
@@ -39,16 +54,24 @@ class Empire(models.Model):
 	decision_locked = models.ForeignKey(User, null=True, related_name = "decision_lockedEmpire")
 
 
+	def __unicode__(self):
+		return u'%s' % self.emperor
+
+
 class UserCustom(AbstractUser):
 	empire = models.ForeignKey(Empire, blank=True, null=True, related_name="empireUserCustom")
-	rank = models.CharField(max_length=255, choices=RANK_CHOICES)
-	websocket_token = models.CharField(max_length=255)
+	rank = models.CharField(max_length=255, choices=RANK_CHOICES, default=0)
+	websocket_token = models.CharField(max_length=255, default=generate_random_string(64))
 	supply_points = models.IntegerField(default=0)
 	chat_oneonone_connected = models.BooleanField(default = False)
 	chat_empire_connected = models.BooleanField(default = False)
 
+
 class Event(models.Model):
 	name = models.CharField(max_length=255)
+
+	def __unicode__(self):
+		return u'%s' % self.name
 
 
 class EmpireEvent(models.Model):
@@ -56,6 +79,9 @@ class EmpireEvent(models.Model):
 	event = models.ForeignKey(Event)
 	timestamp = models.DateTimeField(auto_now_add=True)
 	description = models.CharField(max_length=1024)
+
+	def __unicode__(self):
+		return u'%s' % self.event
 
 
 class Territory(models.Model):
@@ -69,6 +95,9 @@ class Territory(models.Model):
 	supply_points = models.IntegerField(default=0)
 	sp_points_1mov = models.IntegerField(default=0)
 	sp_points_2mov = models.IntegerField(default=0)
+
+	def __unicode__(self):
+		return u'%s' % self.name
 
 
 class Battle(models.Model):
@@ -89,12 +118,19 @@ class Battle(models.Model):
 	attacker_empire = models.ForeignKey(Empire, related_name='attacker_empireBattle')
 	defender_empire = models.ForeignKey(Empire, related_name='defender_empireBattle')
 
+	def __unicode__(self):
+		return u'Attacker: %s Defender %s' % (self.attacker, self.defender)
+
 
 class Decision(models.Model):
 	timestamp = models.DateTimeField(auto_now_add=True)
 	empire = models.ForeignKey(Empire)
 	territory = models.ForeignKey(Territory)
 	final = models.BooleanField(default=False)
+
+	def __unicode__(self):
+		return u'Empire %s Territory %s' % (self.empire, self.territory)
+
 
 class DecisionAttack(Decision):
 	commander = models.ForeignKey(User)
