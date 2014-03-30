@@ -46,20 +46,49 @@ def connected_oneonone(req):
 		return jsonfy({'valid': False})
 	try:
 		user = models.UserCustom.objects.get(id = req.GET["user_id"])
-		user.chat_oneonone_connected = req.GET["presence"]
+		user.chat_oneonone_connected = True if req.GET["presence"] == "True" else False
 		user.save()
 		return jsonfy({'valid': user.chat_oneonone_connected})
-	except Exception, e:
+	except ObjectDoesNotExist, e:
 		return jsonfy({'valid': False})
+
 def connected_empire(req):
 	if "user_id" not in req.GET or "presence" not in req.GET or "empire_id" not in req.GET:
 		return jsonfy({'valid': False})
+	try:
+		user = models.UserCustom.objects.filter(empire = req.GET["empire_id"]).get(id = req.GET["user_id"])
+		user.chat_empire_connected = True if req.GET["presence"] == "True" else False
+		user.save()
+		return jsonfy({'valid': user.chat_empire_connected})
+	except ObjectDoesNotExist, e:
+		return jsonfy({'valid': False})
+
 def list_oneonone(req):
+	cons = models.UserCustom.objects.filter(chat_oneonone_connected = True).values('id', 'username')
+	return jsonfy({'list': cons})
 
-	pass
 def list_empire(req):
+	if "empire_id" not in req.GET:
+		return jsonfy({'valid': False})
+	cons = models.UserCustom.objects.filter(chat_empire_connected = True, empire = req.GET["empire_id"]).values('id', 'username')
+	return jsonfy({'values': False, 'list': cons})
 
-	pass
+def battle_info(req):
+	if "battle_id" not in req.GET:
+		return jsonfy({'ok': False})
+	try:
+		battle = models.Battle.objects.filter(id = req.GET["battle_id"]).get()
+		battlefield = models.Territory.objects.filter(id = battle.territory).get()
+		return jsonfy({'ok': True, 
+			'attacker': battle.attacker, 
+			'defender': battle.defender,
+			'sp_attacker': battle.sp_attacker,
+			'sp_defender': battle.sp_defender,
+			'conf_attacker': json.loads(battle.conf_attacker),
+			'conf_defender': json.loads(battle.conf_defender),
+			'battlefield': json.loads(battlefield)})
+	except ObjectDoesNotExist, e:
+		return jsonfy({'ok': False})
 
 def jsonfy(obj):
 	return HttpResponse(json.dumps(obj))
