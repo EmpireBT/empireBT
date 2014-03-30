@@ -1,0 +1,142 @@
+<style type="text/css">
+.chattab{
+	display: inline-block;
+	width: 150px;
+}
+.messageChatDiv{
+	display: inline-block;
+	vertical-align: middle;
+}
+.chatWrapper{
+	width: 310px;
+}
+.chatDialog{
+	width: 200px;
+	display: inline-block;
+}
+.chatsWrapper,.chatWrapper{
+	display: inline-block;
+}
+.chatContainer{
+	position: fixed;
+	right: 5px;
+	bottom: 5px;
+}
+</style>
+<script type="text/javascript">
+$(document).on('ready', function(){
+	$('#publicA').on('click', function(e){
+		e.preventDefault();
+		$('#empireWindow').hide();
+		$('#publicWindow').removeClass('hidden');
+	})
+	$('#empireA').on('click', function(e){
+		e.preventDefault();
+		$('#empireWindow').show();
+		$('#publicWindow').addClass('hidden');
+	})
+})
+</script>
+<div class="chatContainer">
+	<div class="chatsWrapper">
+		<div class="chatDialog">
+			<div>
+				<a href="#">username</a>
+				<a href="#">-</a>
+				<a href="#">x</a>
+			</div>
+			<div class="messagesChatSingleArea">
+					<div class="messageChatSingle">
+						<div class="messageChatSingleDiv">
+							<a href="#">username</a>
+						</div>
+						<div class="messageChatDiv">
+							<p>text text text text text text text text text text text text text</p>
+						</div>
+					</div>
+					<div class="messageSingleArea">
+						<form>
+							<input type="text" class="messageSingleInput">
+							<button type="submit">Send</button>
+						</form>
+					</div>
+			</div>
+		</div>
+		<div class="chatDialog">
+			<div>
+				<a href="#">username</a>
+				<a href="#">-</a>
+				<a href="#">x</a>
+			</div>
+			<div class="messagesChatSingleArea">
+					<div class="messageChatSingle">
+						<div class="messageChatSingleDiv">
+							<a href="#">username</a>
+						</div>
+						<div class="messageChatDiv">
+							<p>text text text text text text text text text text text text text</p>
+						</div>
+					</div>
+					<div class="messageSingleArea">
+						<form>
+							<input type="text" class="messageSingleInput">
+							<button type="submit">Send</button>
+						</form>
+					</div>
+			</div>
+		</div>
+	</div>
+	<div class="chatWrapper">
+		<div class="chatTabs">
+			<div id="empireTab" class="chattab">
+				<a id="empireA" href="#">Empire</a>
+			</div>
+			<div id="publicTab" class="chattab">
+				<a id="publicA" href="#">Public</a>
+			</div>
+		</div>
+		<div class="chatContent">
+			<div id="empireWindow">
+				<div id="chatArea">
+					<div class="messageChat">
+						<div class="messageChatDiv">
+							<a href="#">username</a>
+						</div>
+						<div class="messageChatDiv">
+							<p>text text text text text text text text text text text text text</p>
+						</div>
+					</div>
+					<div class="messageChat">
+						<div class="messageChatDiv">
+							<a href="#">username</a>
+						</div>
+						<div class="messageChatDiv">
+							<p>text text text text text text text text text text text text text</p>
+						</div>
+					</div>
+					<div class="messageChat">
+						<div class="messageChatDiv">
+							<a href="#">username</a>
+						</div>
+						<div class="messageChatDiv">
+							<p>text text text text text text text text text text text text text</p>
+						</div>
+					</div>
+
+				</div>
+				<div id="messageArea">
+					<form>
+						<input type="text" id="messageInput">
+						<button type="submit">Send</button>
+					</form>
+				</div>
+			</div>
+			<div id="publicWindow" class="hidden">
+				<ul>
+					<li><a href="#">username1</a></li>
+					<li><a href="#">username1</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>
