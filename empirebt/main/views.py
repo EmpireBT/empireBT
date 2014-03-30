@@ -29,8 +29,8 @@ def battle_auth(req):
 
 	try:
 		user = models.UserCustom.objects.filter(
-			websocket_token = reg.GET["token"]
-		).get(id = reg.GET["user_id"])
+			websocket_token = req.GET["token"]
+		).get(id = req.GET["user_id"])
 		#models.Battle.objects.filter(id = req.GET["battle_id"], attacker__name = 'Pancho').get()
 		battle = models.Battle.objects.get(id = req.GET["battle_id"])
 		valid = battle.attacker.id == user.id or battle.defender.id == user.id
@@ -110,6 +110,28 @@ def battle_result(req):
 @login_required(login_url = '/login/')
 def lock_summary(req):
 	user = req.UserCustom
+
+@login_required(login_url = '/login/')
+def summary_lock(req):
+	if "empire_id" not in req.POST or "lock" not in req.POST:
+		return jsonfy({'ok': False})
+	try:
+		user = req.user
+		empire = models.Empire.objects.get(id = req.POST['empire_id'])
+		if empire.summary_lock == None:
+			empire.summary_lock = user
+		elif empire.summary_lock.rank > user.rank:
+			empire.summary_lock = user if req.POST['lock'] == "True" else None
+		empire.save()
+		return jsonfy({'ok': True})
+	except ObjectDoesNotExist, e:
+		return jsonfy({'ok': False})
+
+def falsify(req):
+	battle = models.Battle.objects.get(id = 1)
+	battle.battle_manager_started = False
+	battle.save()
+	return jsonfy({'ok': True})
 
 def jsonfy(obj):
 	return HttpResponse(json.dumps(obj))
