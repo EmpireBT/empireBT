@@ -95,7 +95,8 @@ def battle_result(req):
 		return jsonfy({'ok': False})
 	try:
 		battle = models.Battle.objects.get(id=req.POST['battle_id'])
-		battle.winner = req.POST['winner']
+		winner = models.UserCustom.objects.get(id=req.POST['winner'])
+		battle.winner = winner
 		battle.sp_conceded = int(req.POST['sp_conceded'])
 		battle.sp_casualties_attacker = int(req.POST['sp_casualties_attacker'])
 		battle.sp_casualties_defender = int(req.POST['sp_casualties_defender'])
