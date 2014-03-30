@@ -125,7 +125,8 @@
 	<div class="col-md-8">
 		<div>
 			<h2><img src="{{ MEDIA_URL }}icons/download.svg">Communication Dashboard</h2>
-			<h4>{{ user.empire.name }}</h4>
+
+			<h4>{{ hola }}{{ user.empire.name }}</h4>
 			<span>Summary by <a href="#">{{ user.empire.emperor }}</a></span></br>
 			<a href="#"><span class="fui-lock"></span>Lock</a>
 			<p>{{ user.empire.summary}}</p>
@@ -142,7 +143,9 @@
 				</div>
 				<div class="attacksWrapper">
 					<ul style="list-style:none">
+                        {% for d in attack_decisions %}
 						<li><a href="#">Commander 1</a> to <a href="#">Territory 1</a></li>
+                        {% endfor %}
 						<li><a href="#">Commander 1</a> to <a href="#">Territory 1</a></li>
 						<li><a href="#">Commander 1</a> to <a href="#">Territory 1</a></li>
 						<li><a href="#">+ Pro1</a></li>
@@ -203,5 +206,46 @@
 
 
 {% include "chat.html" %}
+<script>
+$(function() {
+    var user_id = "{{user.id}}";
+    var token = "{{user.websocket_token}}";
+    var empire_id = "{{user.empire.id}}";
+    var base_url = 'http://localhost:8000';
+    var chat_empire = io.connect(base_url + 
+            '/chat_empire?token=' + token + '&user_id=' + user_id + 
+            '&empire_id=' + empire_id), 
+        chat_oneonone = io.connect(base_url + 
+            '/chat_oneonone');
+    var users = {};
+    chat_empire.on('connect', function () {
+      //$.get list empire
+    }).on('connect_failed', function () {
+      //desplegar error en el servidor  
+    }).on('presence logout', function (data) {
+      //marcar que se desconectó un usuario
+      console.log('chat_empire presence logout', data);
+    }).on('presence login', function (data) {
+      //marcar que entró un wey,
+      //users[u.user_id]=u.username wey
+      console.log('chat_empire presence login', data);
+    }).on('receive message', function (data) {
+      //desplegar mensaje
+      console.log('receive message', data);
+    });
+
+    chat_oneonone.on('connect', function () {
+      console.log("chat_oneonone connect.");
+    }).on('connect_failed', function () {
+      console.log("chat_oneonone connect_failed");    
+    }).on('receive message', function (data) {
+      console.log('receive message', data);
+    }).on('presence logout', function (data) {
+      console.log('chat_oneonone presence logout', data);
+    }).on('presence login', function (data) {
+      console.log('chat_oneonone presence login', data);
+    });
+});
+</script>
 
 {% endblock %}

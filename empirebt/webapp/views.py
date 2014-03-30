@@ -19,7 +19,7 @@ def register(request):
 
 @login_required(login_url = '/login')
 def dashboard(request):
-	return render_to_response('dashboard.html', {}, context_instance=RequestContext(request))
+	return render_to_response('dashboard.html', { "hola" : "QUE ONDA!"}, context_instance=RequestContext(request))
 
 
     

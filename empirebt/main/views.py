@@ -15,13 +15,16 @@ def empire_auth(req):
 	if "token" not in req.GET or "user_id" not in req.GET or "empire_id" not in req.GET:
 		return jsonfy({'valid': False})
 	res = models.UserCustom.objects.filter(id = req.GET["user_id"], websocket_token = req.GET["token"], emperorEmpire = req.GET["empire_id"]).exists()
-	return jsonfy({'valid': res})
+	user = models.UserCustom.objects.get(id = req.GET["user_id"])
+	return jsonfy({'valid': res, 'username' : user.username})
+
 
 def oneonone_auth(req):
 	if "token" not in req.GET or "user_id" not in req.GET:
 		return jsonfy({'valid': False})
 	res = models.UserCustom.objects.filter(id = req.GET["user_id"], websocket_token = req.GET["token"]).exists()
-	return jsonfy({'valid': res})
+	user = models.UserCustom.objects.get(id = req.GET["user_id"])
+	return jsonfy({'valid': res, 'username' : user.username})
 
 def battle_auth(req):
 	if "token" not in req.GET or "user_id" not in req.GET or "battle_id" not in req.GET:
@@ -58,13 +61,8 @@ def connected_empire(req):
 		return jsonfy({'ok': False})
 	try:
 		user = models.UserCustom.objects.filter(empire = req.GET["empire_id"]).get(id = req.GET["user_id"])
-		print user
 		
 		user.chat_empire_connected = req.GET["presence"] == "true"
-		print user.username, user.chat_empire_connected
-		print req.GET['presence']
-		print user.save()
-		print user.chat_empire_connected
 		return jsonfy({'ok': True})
 	except ObjectDoesNotExist, e:
 		return jsonfy({'ok': False, 'exception': True})
