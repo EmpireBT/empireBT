@@ -1,21 +1,5 @@
 from django.views.generic import TemplateView
 from django.conf.urls import patterns, include, url
-<<<<<<< HEAD
-from empirebt.main.api import UserResource
-#from empirebt.main.authorization import GeneralAuthorization
-import empirebt.main.views as views
-# Uncomment the next two lines to enable the admin:
-# from django.contrib import admin
-# admin.autodiscover()
-
-user_resource = UserResource()
-#general_authorization = GeneralAuthorization()
-
-urlpatterns = patterns('',
-    # Examples:
-    # url(r'^$', 'empirebt.views.home', name='home'),
-    url(r'^api/', include(user_resource.urls)),
-=======
 from django.conf.urls.static import static
 from django.conf import settings
 from django.contrib.auth.views import login, logout
@@ -36,7 +20,6 @@ urlpatterns = patterns('',
     url(r'^register/$', register),
     url(r'^dashboard/$', dashboard),
 
->>>>>>> 0179dc34d0a7afd29d11f2d889832307b0d4a1ca
     url(r'^authorization/general\.json', views.auth_general),
     url(r'^authorization/chat_empire\.json', views.empire_auth),
     url(r'^authorization/chat_oneonone\.json', views.oneonone_auth),
@@ -46,13 +29,10 @@ urlpatterns = patterns('',
     url(r'^chat_oneonone/list\.json', views.list_oneonone),
     url(r'^chat_empire/list\.json', views.list_empire),
 <<<<<<< HEAD
-    url(r'^battle/info\.json', views.battle_info),
+	url(r'^battle/info\.json', views.battle_info),
     url(r'^battle/result\.json', views.battle_result),
     url(r'^login/', views.lock_summary),
-    #url(r'^authorization/', include(general_authorization.urls)),
-    # Uncomment the admin/doc line below to enable admin documentation:
-    # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 =======
->>>>>>> 0179dc34d0a7afd29d11f2d889832307b0d4a1ca
+>>>>>>> master
 
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

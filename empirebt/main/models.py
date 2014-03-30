@@ -49,8 +49,10 @@ class Empire(models.Model):
 	fallen_date = models.DateTimeField(blank=True, null=True)
 	supply_points = models.IntegerField(default=200)
 	moral = models.IntegerField(default=3)
-	summary = models.CharField(max_length=255, blank=True, null=True)
-	summary_locked = models.ForeignKey(User, blank=True ,null=True, related_name = "summary_lockedEmpire")
+	summary = models.CharField(default='', max_length=255)
+	summary_locked = models.ForeignKey(User, null=True, related_name = "summary_lockedEmpire")
+	decision_locked = models.ForeignKey(User, null=True, related_name = "decision_lockedEmpire")
+
 
 	def __unicode__(self):
 		return u'%s' % self.emperor

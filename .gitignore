@@ -7,3 +7,11 @@ localsettings.py
 
 *.sqlite3
 
+
+.DS_Store
+
+.DS_Store
+
+empirebt/.DS_Store
+
+*.orig
