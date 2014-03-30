@@ -1,0 +1,337 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<script type="text/javascript" src="http://code.createjs.com/createjs-2013.12.12.min.js"></script>
+	<script type="text/javascript" src="/media/game_runner.js"></script>
+	<script type="text/javascript">
+	var stage;
+	var queue;
+	var tiles_widht = 24;
+	var tiles_height = 20;
+	var tile_widht = 30;
+	var tile_height = 30;
+	var hill_tiles = [226,225,227,228,229,202,203,204,179,250,251,252,275];
+	var mi_turno = true;
+	var game_runner;
+
+	var tile_x = 0;
+	var tile_y = 0;
+
+	function init(){
+		stage = new createjs.Stage("myCanvas");
+		queue = new createjs.LoadQueue(true);
+		queue.addEventListener("complete", handleComplete);
+		queue.loadManifest([{id:"deisy",src:"/media/assets/daisy.png"},
+			{id:"grassTile",src:"/media/assets/grassTile.jpeg"},
+			{id:"skeleton",src:"/media/assets/BODY_skeleton.png"},
+			{id:"male",src:"/media/assets/BODY_male.png"},
+			{id:"hurtSkeleton",src:"/media/assets/HURT_skeleton.png"},
+			{id:"selectedTile",src:"/media/assets/selectedTile.jpeg"},
+			{id:"arrow",src:"/media/assets/WEAPON_arrow.png"},
+			{id:"warrior",src:"/media/assets/male_sprites.png"},
+			{id:"hill",src:"/media/assets/hill.jpeg"}
+			]);
+		game_runner = new GameRunner({});
+	}
+
+	function handleComplete(event){
+		var tile_data = {
+			framerate: 1,
+			images: [queue.getResult("grassTile"),queue.getResult("hill")],
+			frames: {width:200, height:200},
+			animations: {green:[0],blue:[1],red:[2],hill:[3]}
+		}
+		var skeleton_data = {
+			framerate: 8,
+			images: [queue.getResult("skeleton"),queue.getResult("hurtSkeleton")],
+			frames: {width:64, height:64},
+			animations: {standRight:[27],runRight:[27,35],standLeft:[9],runLeft:[9,17],standTop:[0],runTop:[0,8],standBottom:[18],runBottom:[18,26],lie:[41],hurt:[36,41,"lie"]}
+		}
+		var male_data = {
+			framerate: 8,
+			images: [queue.getResult("male")],
+			frames: {width:64, height:64},
+			animations: {standRight:[27],runRight:[27,35],standLeft:[9],runLeft:[9,17],standTop:[0],runTop:[0,8],standBottom:[18],runBottom:[18,26]}
+		}
+		var warrior_data = {
+			framerate: 8,
+			images: [queue.getResult("warrior")],
+			frames: {width:64, height:64},
+			animations: {standRight:[143],runRight:[143,151],standLeft:[117],runLeft:[117,125],standTop:[104],runTop:[104,113],standBottom:[130],runBottom:[130,128],lie:[265],stands:[262],hurt:[260,262,"stands"],die:[260,265,"lie"],hurtDie:[262,265,"lie"],attackRight:[195,196,197,198,199,200,200,199,198,197,196,195,"standRight"],attackLeft:[169,170,171,172,173,174,174,173,172,171,170,169,"standLeft"],attackTop:[156,157,158,159,160,161,161,160,159,158,157,156,"standTop"],attackBottom:[182,183,184,185,186,187,187,186,185,184,183,182,"standBottom"]}
+		}
+		var enemyUnits = [7,8,9,10,11,12,13,14,15,16];
+		var ownUnits = [463,464,465,466,467,468,469,470,471,472];
+		
+		var tile_sheet = new createjs.SpriteSheet(tile_data);
+		var sprite_skeleton = new createjs.SpriteSheet(skeleton_data);
+		var warrior_sheet = new createjs.SpriteSheet(warrior_data);
+		var male_sheet = new createjs.SpriteSheet(male_data);
+		var tile = new createjs.Sprite(tile_sheet, "green");
+		var animation_skeleton = new createjs.Sprite(sprite_skeleton, "standRight");
+		var warrior = new createjs.Sprite(warrior_sheet, "standTop");
+		var male = new createjs.Sprite(male_sheet, "standTop");
+
+		var tile_bounds = tile.getBounds();
+		var skeleton_bounds = animation_skeleton.getBounds();
+		var warrior_bounds = warrior.getBounds();
+		var male_bounds = male.getBounds();
+		
+		tile.scaleX = tile_widht / tile_bounds.width;
+		tile.scaleY = tile_height / tile_bounds.height;
+		animation_skeleton.scaleX = tile_widht / skeleton_bounds.width;
+		animation_skeleton.scaleY = tile_height / skeleton_bounds.height;
+		warrior.scaleX = tiles_widht / warrior_bounds.width;
+		warrior.scaleY = tiles_height / warrior_bounds.height;
+		male.scaleX = tiles_widht / male_bounds.width;
+		male.scaleY = tiles_height / male_bounds.height;
+
+		for(tile_y = 0; tile_y < tiles_height; tile_y++){
+			tile.y = tile_y * 30;
+			for(tile_x = 0; tile_x < tiles_widht; tile_x++){
+				var new_tile = new createjs.Sprite(tile_sheet,"green");
+				tile.x = tile_x * 30;
+				new_tile.addEventListener("click",handleTileClick)
+				new_tile.scaleX = tile.scaleX;
+				new_tile.scaleY = tile.scaleY;
+				new_tile.x = tile.x;
+				new_tile.y = tile.y;
+				stage.addChild(new_tile);
+				if(hill_tiles.indexOf(stage.getChildIndex(new_tile)) >= 0){
+					new_tile.gotoAndPlay("hill");
+				}
+			}
+		}
+
+		for(var unitIndex in ownUnits){
+			var unit = new createjs.Sprite(warrior_sheet,"standTop");
+			var ownUnit = ownUnits[unitIndex];
+			unit.scaleX = warrior.scaleX;
+			unit.scaleY = warrior.scaleY;
+			unit.x = (ownUnit % tiles_widht) * 30;
+			unit.y = Math.floor(ownUnit / tiles_widht) * 30;
+			unit.name = ownUnit;
+			console.log(unit.x + " "+ unit.y + " " + unit.name);
+			unit.addEventListener("click",handlePrepare);
+			stage.addChild(unit);
+		}
+
+		console.log(game_runner.test());
+		createjs.Ticker.setFPS(60);
+		createjs.Ticker.addEventListener("tick",tick);
+	}
+
+
+	var tiles_events = [];
+	var tiles_to_cleanup = [];
+	function handlePrepare(event){
+		if(mi_turno == false){
+			return;
+		}
+		var prepared = event.target;
+		//var arrayOfTiles = [226,225,228,229,202,203,204,179,250,251,252,275];
+		var arrayOfTiles = generatePossIndex(prepared.name);
+		var arrayOfTargets = [11,239,467,216,0,23,479,456];
+
+		for(var i = 0; i < arrayOfTiles.length;i++){
+			var temp_tile = stage.getChildAt(arrayOfTiles[i]);
+			
+			tiles_event = handleWalk(prepared);
+			tiles_events.push(tiles_event);
+			temp_tile.addEventListener("click", tiles_event);
+			tiles_to_cleanup.push(temp_tile);
+			temp_tile.gotoAndPlay("blue");
+
+		}
+		for(var j = 0; j < arrayOfTargets.length;j++){
+			target_tile = stage.getChildAt(arrayOfTargets[j]);
+
+			targets_event = handleArrow(prepared);
+			tiles_events.push(targets_event);
+			target_tile.addEventListener("click", targets_event);
+			tiles_to_cleanup.push(target_tile);
+			target_tile.gotoAndPlay("red");
+		}
+		prepared.removeEventListener("click", handlePrepare);
+	}
+
+	function handleWalk(prepared){
+		return function (event) {
+			var tile = event.target;
+			var deltaX = (tile.x - prepared.x) / 30;
+			var deltaY = (tile.y - prepared.y) / 30;
+			var move;
+
+			if(Math.abs(deltaX) >= Math.abs(deltaY)){
+				if(deltaX > 0){
+					move = "runRight";
+				}else{
+					move = "runLeft";
+				}	
+			} else{
+				if(deltaY > 0){
+					move = "runBottom";
+				}else{
+					move = "runTop";
+				}
+			}
+			
+			prepared.gotoAndPlay(move);
+			var tween = createjs.Tween.get(prepared).to({ x : tile.x, y : tile.y}, 1000).call(endWalk, [prepared]);
+		}
+	}
+
+	function handleArrow(prepared){
+		return function (event) {
+			console.log("handleArrow");
+			var tile = event.target;
+			var deltaX = (tile.x - prepared.x) / 30;
+			var deltaY = (tile.y - prepared.y) / 30;
+			var arrow_data = {
+				framerate: 8,
+				images: [queue.getResult("arrow")],
+				frames: {width:64,height:64},
+				animations: {travel:[17]}
+			}
+			var arrow_sheet = new createjs.SpriteSheet(arrow_data);
+			var arrow_sprite = new createjs.Sprite(arrow_sheet,"travel");
+			var rotation = Math.atan(deltaY/deltaX);
+			rotation = rotation * 180 / Math.PI;
+			arrow_sprite.setTransform(prepared.x,prepared.y,prepared.scaleX,prepared.scaleY,rotation);
+			stage.addChild(arrow_sprite);
+			var arrow_tween = createjs.Tween.get(arrow_sprite).to({x: tile.x, y: tile.y},2000).call(endArrow,[prepared,arrow_sprite]);
+		}
+	}
+
+	function endWalk(prepared) {
+		prepared.gotoAndPlay("attack" + prepared.currentAnimation.substring(3));
+		console.log(prepared.currentAnimation);
+		prepared.addEventListener("click", handlePrepare);
+		var name = prepared.x / 30 + (prepared.y/30) * 24;
+		name = Math.round(name);
+		prepared.name = name;
+		console.log(prepared.name);
+		cleanEvents();
+	}
+
+	function endArrow(prepared,arrow) {
+		prepared.addEventListener("click", handlePrepare);
+		cleanEvents();
+		stage.removeChild(arrow);
+	}
+
+	function handleTileClick(event){
+		var selected_tile = event.target;
+		console.log(stage.getChildIndex(selected_tile));
+	}
+
+	function tick(event){
+		stage.update(event);
+	}
+
+	function terminarTurno(button){
+		mi_turno = false;
+		button.innerHTML = "Espere su turno";
+		cleanEvents();
+	}
+
+	function cleanEvents(){
+		for (var i in tiles_events) {
+			var te = tiles_events[i];
+			var t = tiles_to_cleanup[i];
+			t.removeAllEventListeners('click');
+			if(hill_tiles.indexOf(stage.getChildIndex(t)) >= 0){
+				t.gotoAndPlay("hill");
+			}else{
+				t.gotoAndPlay("green");
+			}
+		}
+	}
+
+	function wrapperAvailable(prepared){
+
+	}
+
+	function generatePossIndex(baseIndex){
+		var possIndex = [1,2,-1,-2,-25,-24,-23,-48,25,24,23,48];
+		var valIndex = [];
+		var baseX = baseIndex % 24;
+		var baseY = Math.floor(baseIndex);
+		if(baseX < 23)valIndex.push(baseIndex + 1);
+		if(baseX < 22)valIndex.push(baseIndex + 2);
+		if(baseX > 0)valIndex.push(baseIndex - 1);
+		if(baseX > 1)valIndex.push(baseIndex -2);
+		if(baseY < 19)valIndex.push(baseIndex + 24);
+		if(baseY < 18)valIndex.push(baseIndex + 48);
+		if(baseY > 0)valIndex.push(baseIndex - 24);
+		if(baseY > 1)valIndex.push(baseIndex - 48);
+		if(baseIndex > 0)valIndex.push(baseIndex - 25);
+		if(baseIndex != 23)valIndex.push(baseIndex -23);
+		if(baseIndex != 456)valIndex.push(baseIndex + 23);
+		if(baseIndex < 479)valIndex.push(baseIndex + 25);
+		return valIndex;
+	}
+	</script>
+
+	<canvas id="myCanvas" width="720" height="600">
+		Alternative Contest
+	</canvas>
+	<button id="turno" onclick="terminarTurno(this);">Terminar Turno</button>
+
+
+{% include "chat.html" %}
+<script>
+$(function() {
+    var user_id = "{{user.id}}";
+    var token = "{{user.websocket_token}}";
+    var empire_id = "{{user.empire.id}}";
+    var base_url = 'http://10.20.217.217:8000';
+    var battle_id = 1;
+    var battle = io.connect(base_url + 
+            '/battle?token=' + token + '&user_id=' + user_id + 
+            '&empire_id=' + empire_id + '&battle_id=' + battle_id);
+    console.log(base_url + 
+            '/chat_empire?token=' + token + '&user_id=' + user_id + 
+            '&empire_id=' + empire_id + '&battle_id=' + battle_id);
+    var chat_empire = io.connect(base_url + 
+            '/chat_empire'), 
+        chat_oneonone = io.connect(base_url + 
+            '/chat_oneonone');
+    var users = {};
+    chat_empire.on('connect', function () {
+      //$.get list empire
+    }).on('connect_failed', function () {
+      //desplegar error en el servidor  
+    }).on('presence logout', function (data) {
+      //marcar que se desconectó un usuario
+      console.log('chat_empire presence logout', data);
+    }).on('presence login', function (data) {
+      //marcar que entró un wey,
+      //users[u.user_id]=u.username wey
+      console.log('chat_empire presence login', data);
+    }).on('receive message', function (data) {
+      //desplegar mensaje
+      console.log('receive message', data);
+    });
+
+    chat_oneonone.on('connect', function () {
+      console.log("chat_oneonone connect.");
+    }).on('connect_failed', function () {
+      console.log("chat_oneonone connect_failed");    
+    }).on('receive message', function (data) {
+      console.log('receive message', data);
+    }).on('presence logout', function (data) {
+      console.log('chat_oneonone presence logout', data);
+    }).on('presence login', function (data) {
+      console.log('chat_oneonone presence login', data);
+    });
+    battle.on('connect', function () {
+      battle.emit('send message',{'type': 'init'});
+      console.log("battle connect.");
+    }).on('connect_failed', function () {
+      console.log("battle connect_failed");    
+    }).on('server ready', function (data) {
+      console.log('battle receive message', data);
+    });
+});
+</script>
+{% endblock %}

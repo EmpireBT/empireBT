@@ -89,20 +89,15 @@ def list_empire(req):
 
 def battle_info(req):
 	if "battle_id" not in req.GET:
-		return jsonfy({'ok': False})
+		return jsonfy({'ok': False, 'missing_params': True})
 	try:
-		battle = models.Battle.objects.filter(id = req.GET["battle_id"]).get()
-		territory = models.Territory.objects.get(id = battle.territory.id)
-		return jsonfy({'ok': True, 
-			'attacker': battle.attacker.username, 
-			'defender': battle.defender.username,
-			'sp_attacker': battle.sp_attacker,
-			'sp_defender': battle.sp_defender,
-			'conf_attacker': json.loads(battle.conf_attacker),
-			'conf_defender': json.loads(battle.conf_defender),
-			'battlefield': json.loads(territory.battlefield)})
+		battle = models.Battle.objects.get(id=req.GET['battle_id'])
+		#territory = models.Territory.objects.get(id = battle.territory.id)
+		return jsonfy({'ok': True, 'attacker': battle.attacker.id, 'defender': battle.defender.id, 'sp_attacker': battle.sp_attacker, 'sp_defender': battle.sp_defender, 'conf_attacker': json.loads(battle.conf_attacker), 'conf_defender': json.loads(battle.conf_defender), 'battlefield': json.loads(battle.territory.battlefield)})
+		#return jsonfy({'swag':True})
 	except ObjectDoesNotExist, e:
-		return jsonfy({'ok': False})
+		return jsonfy({'ok': False, 'exception': True})
+
 def battle_result(req):
 	if "battle_id" not in req.POST:
 		return jsonfy({'ok': False})

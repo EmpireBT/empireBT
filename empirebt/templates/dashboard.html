@@ -17,15 +17,17 @@
 				<h4>Choose Commander</h4>
 				<select name="commander" value="commander" class="form-control">
 		            <option value="0">Choose Commander</option>
-		            <option value="1">Commander 1</option>
-		            <option value="2">Commander 2</option>
+		            {% for value in commanders %}
+						<option value="{{value}}">{{value}}</option>
+					{% endfor %}
 		        </select>
 
 		       	<h4>Choose Territory</h4>
 				<select name="commander" value="commander" class="form-control">
 		            <option value="0">Choose Territory</option>
-		            <option value="1">Territory 1</option>
-		            <option value="2">Territory 2</option>
+		            {% for value in otrosterr %}
+						<option value="{{value}}">{{value}}</option>
+					{% endfor %}
 		        </select>
 
 				<input type="submit" value="SAVE" class="btn btn-block btn- btn-success">
@@ -56,15 +58,17 @@
 				<h4>Choose Commander</h4>
 				<select name="commander" value="commander" class="form-control">
 		            <option value="0">Choose Commander</option>
-		            <option value="1">Commander 1</option>
-		            <option value="2">Commander 2</option>
+		            {% for value in commanders %}
+						<option value="{{value}}">{{value}}</option>
+					{% endfor %}
 		        </select>
 
 		       	<h4>Choose Territory</h4>
 				<select name="commander" value="commander" class="form-control">
 		            <option value="0">Choose Territory</option>
-		            <option value="1">Territory 1</option>
-		            <option value="2">Territory 2</option>
+		            {% for value in misterr %}
+						<option value="{{value}}">{{value}}</option>
+					{% endfor %}
 		        </select>
 
 				<input type="submit" value="SAVE" class="btn btn-block btn- btn-success">
@@ -95,15 +99,17 @@
 		       	<h4>From</h4>
 				<select name="commander" value="commander" class="form-control">
 		            <option value="0">Choose Territory</option>
-		            <option value="1">Territory 1</option>
-		            <option value="2">Territory 2</option>
+		            {% for value in todosterr %}
+						<option value="{{value}}">{{value}}</option>
+					{% endfor %}
 		        </select>
 
 		       	<h4>To</h4>
 				<select name="commander" value="commander" class="form-control">
 		            <option value="0">Choose Territory</option>
-		            <option value="1">Territory 1</option>
-		            <option value="2">Territory 2</option>
+		            {% for value in todosterr %}
+						<option value="{{value}}">{{value}}</option>
+					{% endfor %}
 		        </select>
 
 		        <h4>Points</h4>
@@ -126,11 +132,12 @@
 		<div>
 			<h2><img src="{{ MEDIA_URL }}icons/download.svg">Communication Dashboard</h2>
 
-			<h4>{{ hola }}{{ user.empire.name }}</h4>
+			<h4>{{ empire }}</h4>
 			<span>Summary by <a href="#">{{ user.empire.emperor }}</a></span></br>
 			<a href="#"><span class="fui-lock"></span>Lock</a>
 			<p>{{ user.empire.summary}}</p>
 		</div>
+		
 		<div>
 			<h4><img  src="{{ MEDIA_URL }}icons/clip.svg"> Today's Decisions</h4>
 
@@ -211,7 +218,7 @@ $(function() {
     var user_id = "{{user.id}}";
     var token = "{{user.websocket_token}}";
     var empire_id = "{{user.empire.id}}";
-    var base_url = 'http://localhost:8000';
+    var base_url = 'http://10.20.217.217:8000';
     var chat_empire = io.connect(base_url + 
             '/chat_empire?token=' + token + '&user_id=' + user_id + 
             '&empire_id=' + empire_id), 

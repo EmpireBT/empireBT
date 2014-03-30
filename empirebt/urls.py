@@ -6,7 +6,7 @@ from django.contrib.auth.views import login, logout
 
 import empirebt.main.views as views
 
-from empirebt.webapp.views import register, dashboard
+from empirebt.webapp.views import register, dashboard, battle
 
 
 urlpatterns = patterns('',
@@ -19,6 +19,7 @@ urlpatterns = patterns('',
 
     url(r'^register/$', register),
     url(r'^dashboard/$', dashboard),
+    url(r'^game/$', battle),
 
     url(r'^authorization/general\.json', views.auth_general),
     url(r'^authorization/chat_empire\.json', views.empire_auth),
