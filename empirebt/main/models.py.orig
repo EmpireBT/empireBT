@@ -46,6 +46,23 @@ class Empire(models.Model):
 	emperor = models.ForeignKey(User, related_name="emperorEmpire")
 	name = models.CharField(max_length=255)
 	start_date = models.DateTimeField(auto_now_add=True)
+<<<<<<< HEAD
+	fallen_date = models.DateTimeField(null=True)
+	supply_points = models.IntegerField(default=200)
+	moral = models.IntegerField(default=3)
+	summary = models.CharField(default='', max_length=255)
+	summary_locked = models.ForeignKey(User, null=True, related_name = "summary_lockedEmpire")
+	decision_locked = models.ForeignKey(User, null=True, related_name = "decision_lockedEmpire")
+
+
+class UserCustom(AbstractUser):
+	empire = models.ForeignKey(Empire, blank=True, null=True, related_name="empireUserCustom")
+	rank = models.CharField(max_length=255, choices=RANK_CHOICES)
+	websocket_token = models.CharField(max_length=255)
+	supply_points = models.IntegerField(default=0)
+	chat_oneonone_connected = models.BooleanField(default = False)
+	chat_empire_connected = models.BooleanField(default = False)
+=======
 	fallen_date = models.DateTimeField(blank=True, null=True)
 	supply_points = models.IntegerField(default=200)
 	moral = models.IntegerField(default=3)
@@ -57,13 +74,14 @@ class Empire(models.Model):
 
 
 class UserCustom(AbstractUser):
-	empire = models.ForeignKey(Empire, blank=True, null=True, related_name="empireUserCustom")
+	empire = models.ForeignKey(Empire, blank=True, null=True)
 	rank = models.CharField(max_length=255, choices=RANK_CHOICES, default=0)
 	websocket_token = models.CharField(max_length=255, default=generate_random_string(64))
 	supply_points = models.IntegerField(default=0)
 	chat_oneonone_connected = models.BooleanField(default = False)
 	chat_empire_connected = models.BooleanField(default = False)
 
+>>>>>>> 0179dc34d0a7afd29d11f2d889832307b0d4a1ca
 
 class Event(models.Model):
 	name = models.CharField(max_length=255)

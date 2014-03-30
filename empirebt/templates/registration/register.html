@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div>
+	<div>
+		<h3>Give us your data, we will give it to the NSA</h3>
+	</div>
+	<div class="row">
+		<div class="col-md-4">
+			<form action="" method="POST" enctype="multipart/form-data">{% csrf_token %}
+				<input type="text" class="form-control" placeholder="Username" name="username">
+				{{ form.username.errors }}
+				<input type="password" class="form-control" placeholder="Password" name="password1">
+				{{ form.password1.errors }}
+				<input type="password" class="form-control" placeholder="Repite Password" name="password2">
+				{{ form.password2.errors }}
+				<input type="text" class="form-control" placeholder="Empire Name" name="empire">
+				{{ form.empire.errors }}
+				<input type="submit" value="JOIN US" class="btn btn-block btn-lg btn-success">
+			</form>
+		</div>
+	</div>
+</div>
+{% endblock %}
