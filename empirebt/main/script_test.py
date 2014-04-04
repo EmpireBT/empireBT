@@ -18,5 +18,11 @@ user2.save()
 emp2 = models.Empire(emperor = user2, name = 'queroland', moral = 5, summary = 'Lorem ipsum')
 emp.save()
 emp2.save()
-ter = models.Territory(name = 'Territorio 1', empire = emp, commander = user, battlefield = 'abcdefghijklmnopqrstuvwxyz0123456789', supply_points = 100)
-battle = models.Battle(attacker = user, defender = user2, sp_attacker = 100, sp_defender = 90, conf_attacker = 'abcdefghijklmnopqrstuvwxyz0123456789', conf_defender = 'abcdefghijklmnopqrstuvwxyz0123456789', territory = ter, attacker_empire = emp, defender_empire = emp2)
+user.empire = emp
+user.save()
+user2.empire = emp2
+user2.save()
+ter = models.Territory(name = 'Territorio 1', empire = emp, commander = user, battlefield = '"abcdefghijklmnopqrstuvwxyz0123456789"', supply_points = 100)
+ter.save()
+battle = models.Battle(attacker = user, defender = user2, sp_attacker = 100, sp_defender = 90, conf_attacker = '"abcdefghijklmnopqrstuvwxyz0123456789"', conf_defender = '"abcdefghijklmnopqrstuvwxyz0123456789"', territory = ter, attacker_empire = emp, defender_empire = emp2)
+battle.save()

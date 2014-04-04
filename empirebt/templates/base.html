@@ -11,7 +11,59 @@
 		<link href='http://fonts.googleapis.com/css?family=Quintessential' rel='stylesheet' type='text/css'>
 		<link href='http://fonts.googleapis.com/css?family=Playfair+Display+SC' rel='stylesheet' type='text/css'>
 		<link href='http://fonts.googleapis.com/css?family=Ceviche+One' rel='stylesheet' type='text/css'>
-
+<style type="text/css">
+.chattab{
+	display: inline-block;
+	width: 150px;
+	background: #E6E6E6;
+}
+.messageChatDiv{
+	display: inline-block;
+	vertical-align: middle;
+}
+.chatWrapper{
+	width: 310px;
+}
+.chatDialog{
+	width: 200px;
+	display: inline-block;
+	border: 1px solid gray;
+}
+.chatDialogOptions{
+	border-bottom: 1px solid gray;
+}
+.chatsWrapper,.chatWrapper{
+	display: inline-block;
+}
+.chatContainer{
+	position: fixed;
+	right: 15px;
+	bottom: 5px;
+}
+.chatContainer p{
+	font-size: 14px !important;
+}
+.chatContent{
+	border: 1px solid gray;
+}
+.activetab{
+	border: 1px solid gray;
+}
+#chatArea, #publicWindowArea{
+height: 300px;
+overflow: auto;
+overflow-x: hidden;
+}
+#messageInput,#messageButtonSubmit{
+	display: inline-block;
+}
+#messageInput{
+	width: 240px !important;
+}
+#messageButtonSubmit{
+	width: 60px;
+}
+</style>
 		{% block css %}{% endblock %}
 
 		<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
